@@ -48,7 +48,7 @@ The template starts out very basic, but might receive additional features over t
 
 ### What is this?
 
-C++ SDL project template with Dear ImGUI, and SDL 3.
+An SDL project template with Dear ImGUI, and SDL 3.
 This repository is a template OpenGL project configured using CMake.
 It supports cross-platform builds, and provides a good starting point to begin SDL development.
 
