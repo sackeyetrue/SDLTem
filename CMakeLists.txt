@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16..4.1.1 FATAL_ERROR)
 
+include(FetchContent)
+
 #--------------------------------------------------------------------
 # Project and version.
 #--------------------------------------------------------------------
@@ -13,7 +15,7 @@ project(SDLTem
         VERSION ${SDLTEM_VERSION_STRING} 
         DESCRIPTION "SDL Starter SDLTEM C/C++"
         HOMEPAGE_URL "https://github.com/djoezeke/SDLTem"
-        LANGUAGES  CXX
+  LANGUAGES  C CXX
 )
 
 #--------------------------------------------------------------------
@@ -42,7 +44,7 @@ option(SDLTEM_ENABLE_WARNING "Enable warning messages." ${SDLTEM_IS_TOP_LEVEL})
 
 # Set required C/C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENTIONS OFF)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 #--------------------------------------------------------------------
@@ -70,7 +72,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Add compiler warnings
-if(SDLTEM_ENABLE_WARNINGS)
+if(SDLTEM_ENABLE_WARNING)
   if(MSVC)
     set(COMPILER_WARNINGS /WX /W4 /permissive-)
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
@@ -87,8 +89,20 @@ endif()
 # Add Subdirectories
 #--------------------------------------------------------------------
 
-# Build vendor libraries
-add_subdirectory(vendor)
+FetchContent_Declare(
+  SDL3
+  GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+  GIT_TAG release-3.4.8
+  GIT_SHALLOW TRUE
+)
+
+set(SDL_SHARED ON CACHE BOOL "Build SDL shared library" FORCE)
+set(SDL_STATIC OFF CACHE BOOL "Build SDL static library" FORCE)
+set(SDL_TEST_LIBRARY OFF CACHE BOOL "Build SDL test library" FORCE)
+set(SDL_TESTS OFF CACHE BOOL "Build SDL test programs" FORCE)
+set(SDL_DISABLE_INSTALL ON CACHE BOOL "Disable SDL install target" FORCE)
+
+FetchContent_MakeAvailable(SDL3)
 
 # Build the documentation   
 if(SDLTEM_ENABLE_DOXYGEN)
@@ -113,13 +127,16 @@ endif()
 # Build targets
 #--------------------------------------------------------------------
 
-include_directories("." "./include" "vendor/imgui" "vendor/sdl/include")
-
 set(SDLTEM_SOURCE_FILES "src/main.cpp")
 
 # Add executable
 add_executable("${SDLTEM_EXE_TARGET_NAME}" ${SDLTEM_SOURCE_FILES})
-target_link_libraries("${SDLTEM_EXE_TARGET_NAME}" PRIVATE imgui SDL3-static)
+target_include_directories("${SDLTEM_EXE_TARGET_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries("${SDLTEM_EXE_TARGET_NAME}" PRIVATE SDL3::SDL3)
+
+if(COMPILER_WARNINGS)
+  target_compile_options("${SDLTEM_EXE_TARGET_NAME}" PRIVATE ${COMPILER_WARNINGS})
+endif()
 
 if(SDLTEM_PRODUCTION_BUILD)
 	# setup the ASSETS_PATH macro to be in the root folder of your exe

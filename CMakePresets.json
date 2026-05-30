@@ -1,0 +1,25 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "windows-ninja",
+      "displayName": "Windows Ninja",
+      "description": "Configure SDLTem with Ninja and MinGW on Windows",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "C:/Users/ZEKE/mingw64/bin/gcc.exe",
+        "CMAKE_CXX_COMPILER": "C:/Users/ZEKE/mingw64/bin/g++.exe",
+        "SDLTEM_BUILD_TESTS": "OFF",
+        "SDLTEM_ENABLE_DOXYGEN": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-ninja-debug",
+      "configurePreset": "windows-ninja"
+    }
+  ]
+}
